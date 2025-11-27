@@ -34,7 +34,7 @@
 <script>
 import { onMounted, ref } from 'vue';
 import { useUserStore } from '../stores/userStore';
-import router from '../router';
+
 
 export default {
   setup() {
@@ -47,14 +47,10 @@ export default {
       if (confirm('Are you sure?')) await store.deleteUser(id);
     }
 
-    const editUser = user => {
-      router.push(`/users/edit/${user.id}`);
-    }
-
     const logoutUsers = async () => { await store.logout(); }
 
     onMounted(fetchUsers);
-    return { store, fetchUsers, deleteUser, editUser, logoutUsers, path };
+    return { store, fetchUsers, deleteUser, logoutUsers, path };
   }
 }
 </script>
