@@ -23,7 +23,6 @@
           <td>{{ user.dob }}</td>
           <td><img v-if="user.image" :src="`${path}/storage/${user.image}`" alt="image" /></td>
           <td>
-            <button class="btn btn-warning btn-sm me-2" @click="editUser(user)">Edit</button>
             <button class="btn btn-danger btn-sm" @click="deleteUser(user.id)">Delete</button>
           </td>
         </tr>
