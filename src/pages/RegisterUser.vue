@@ -41,10 +41,21 @@
       </div>
 
       <div class="mb-3">
-        <label for="gender" class="form-label">Gender</label>
-        <input v-model="form.gender" type="text" id="gender" class="form-control" />
+        <label class="form-label">Gender</label>
+
+        <div class="form-check">
+          <input class="form-check-input" type="radio" id="male" value="male" v-model="form.gender" />
+          <label class="form-check-label" for="male">Male</label>
+        </div>
+
+        <div class="form-check">
+          <input class="form-check-input" type="radio" id="female" value="female" v-model="form.gender" />
+          <label class="form-check-label" for="female">Female</label>
+        </div>
+
         <small class="text-danger">{{ errors.gender }}</small>
       </div>
+
 
 
       <div class="mb-3">
@@ -73,6 +84,7 @@ export default {
       phone: '',
       dob: '',
       gender: '',
+      image: '',
     });
 
     const errors = reactive({});
@@ -84,8 +96,16 @@ export default {
       email: yup.string().email('Invalid email').required('Email is required'),
       password: yup.string().min(6, 'Password must be at least 6 characters').required('Password is required'),
       phone: yup.string().required('phone number is valid').matches(/^\+?[1-9]\d{9,14}$/, 'invalid phone'),
-      dob: yup.date('date is required format'),
+      dob: yup.string().required('date is required'),
       gender: yup.string().required('gender is required'),
+      image: yup
+        .mixed()
+        .test('required', 'File is required', (value) => value !== null)
+        .test(
+          'filesize',
+          'File too large (max 2MB)',
+          (value) => !value || value.size <= 2 * 1024 * 1024,
+        ),
     });
 
     const onFileChange = (e) => {

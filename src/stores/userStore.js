@@ -12,7 +12,6 @@ export const useUserStore = defineStore('user', {
     setToken(token) {
       this.token = token
       localStorage.setItem('token', token)
-      // api.defaults.headers.common['Authorization'] = `Bearer ${token}`
     },
     async register(data) {
       const formData = new FormData()
@@ -31,13 +30,20 @@ export const useUserStore = defineStore('user', {
       this.token = null
       this.currentUser = null
       localStorage.removeItem('token')
-      // delete api.defaults.headers.common['Authorization']
       router.push('/login')
     },
     async fetchUsers() {
       const res = await api.get('/users')
       this.users = res.data
     },
+    async updateUser(id, data) {
+      const formData = new FormData()
+      for (let k in data) formData.append(k, data[k])
+      const res = await api.post(`/users/${id}?_method=PUT`, formData)
+      const idx = this.users.findIndex((u) => u.id === id)
+      if (idx !== -1) this.users[idx] = res.data
+    },
+
     async deleteUser(id) {
       await api.delete(`/delete/${id}`)
       this.users = this.users.filter((u) => u.id !== id)

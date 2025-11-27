@@ -28,7 +28,7 @@ export default {
 
     const schema = yup.object({
       email: yup.string().required().email(),
-      password: yup.string().required().min(6),
+      password: yup.string().required(),
     });
 
     const submit = async () => {
