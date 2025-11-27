@@ -21,8 +21,9 @@
           <td>{{ user.email }}</td>
           <td>{{ user.phone }}</td>
           <td>{{ user.dob }}</td>
-          <td><img :src="user.image ? '/storage/uploads' + user.image : ''" height="50" /></td>
+          <td><img v-if="user.image" :src="`${path}/storage/${user.image}`" alt="image" /></td>
           <td>
+            <button class="btn btn-warning btn-sm me-2" @click="editUser(user)">Edit</button>
             <button class="btn btn-danger btn-sm" @click="deleteUser(user.id)">Delete</button>
           </td>
         </tr>
@@ -32,13 +33,14 @@
 </template>
 
 <script>
-import { onMounted } from 'vue';
+import { onMounted, ref } from 'vue';
 import { useUserStore } from '../stores/userStore';
 import router from '../router';
 
 export default {
   setup() {
     const store = useUserStore();
+    const path = ref(import.meta.env.VITE_API_URL);
 
     const fetchUsers = async () => { await store.fetchUsers(); }
 
@@ -53,7 +55,7 @@ export default {
     const logoutUsers = async () => { await store.logout(); }
 
     onMounted(fetchUsers);
-    return { store, fetchUsers, deleteUser, editUser, logoutUsers };
+    return { store, fetchUsers, deleteUser, editUser, logoutUsers, path };
   }
 }
 </script>
