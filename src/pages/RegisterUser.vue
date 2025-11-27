@@ -103,6 +103,7 @@ export default {
         await store.register(data);
 
         alert('Registration successful! Please login.');
+
       } catch (err) {
         if (err.inner) {
           err.inner.forEach((e) => {
