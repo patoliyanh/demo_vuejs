@@ -21,7 +21,7 @@
           <td>{{ user.email }}</td>
           <td>{{ user.phone }}</td>
           <td>{{ user.dob }}</td>
-          <td><img :src="user.image" height="50" /></td>
+          <td><img :src="user.image ? '/storage/uploads' + user.image : ''" height="50" /></td>
           <td>
             <button class="btn btn-danger btn-sm" @click="deleteUser(user.id)">Delete</button>
           </td>

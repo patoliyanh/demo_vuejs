@@ -83,9 +83,9 @@ export default {
       lname: yup.string().required('Last name is required'),
       email: yup.string().email('Invalid email').required('Email is required'),
       password: yup.string().min(6, 'Password must be at least 6 characters').required('Password is required'),
-      phone: yup.string(),
-      dob: yup.date(),
-      gender: yup.string(),
+      phone: yup.string().required('phone number is valid').matches(/^\+?[1-9]\d{9,14}$/, 'invalid phone'),
+      dob: yup.date('date is required format'),
+      gender: yup.string().required('gender is required'),
     });
 
     const onFileChange = (e) => {
@@ -96,7 +96,7 @@ export default {
       try {
         Object.keys(errors).forEach((key) => (errors[key] = ''));
 
-        schema.validate(form, { abortEarly: false });
+        await schema.validate(form, { abortEarly: false });
 
         const data = { ...form };
         if (file.value) data.image = file.value;
