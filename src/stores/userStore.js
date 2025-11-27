@@ -12,6 +12,7 @@ export const useUserStore = defineStore('user', {
     setToken(token) {
       this.token = token
       localStorage.setItem('token', token)
+      api.defaults.headers.common['Authorization'] = `Bearer ${token}`
     },
     async register(data) {
       const formData = new FormData()
@@ -30,6 +31,7 @@ export const useUserStore = defineStore('user', {
       this.token = null
       this.currentUser = null
       localStorage.removeItem('token')
+      delete api.defaults.headers.common['Authorization']
       router.push('/login')
     },
     async fetchUsers() {
