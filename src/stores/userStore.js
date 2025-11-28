@@ -46,8 +46,12 @@ export const useUserStore = defineStore('user', {
       for (let k in data) {
         formData.append(k, data[k])
       }
-      const res = await api.post(`/users/${id}`, formData)
+      const res = await api.post(`/update/${id}`, formData)
       this.user = res.data
+      const index = this.users.findIndex((u) => u.id === id)
+      if (index !== -1) {
+        this.users[index] = res.data
+      }
       return res.data
     },
 

@@ -56,14 +56,17 @@
         <small class="text-danger">{{ errors.gender }}</small>
       </div>
 
-
-
       <div class="mb-3">
         <label for="image" class="form-label">Profile Image</label>
         <input type="file" @change="onFileChange" id="image" class="form-control" />
         <small class="text-danger">{{ errors.image }}</small>
       </div>
       <button type="submit" class="btn btn-primary">Register</button>
+      <p class="mt-3">
+        Have a account?
+        <router-link to="/" class="text-primary">Login</router-link>
+      </p>
+
     </form>
   </div>
 </template>
@@ -72,6 +75,7 @@
 import { reactive, ref } from 'vue';
 import { useUserStore } from '../stores/userStore';
 import * as yup from 'yup';
+import Swal from 'sweetalert2';
 
 export default {
   setup() {
@@ -84,7 +88,7 @@ export default {
       phone: '',
       dob: '',
       gender: '',
-      image: '',
+      image: null,
     });
 
     const errors = reactive({});
@@ -100,16 +104,20 @@ export default {
       gender: yup.string().required('gender is required'),
       image: yup
         .mixed()
-        .test('required', 'File is required', (value) => value !== null)
-        .test(
-          'filesize',
-          'File too large (max 2MB)',
-          (value) => !value || value.size <= 2 * 1024 * 1024,
-        ),
+        .required('File is required')
+        .test('fileSize', 'File too large (max 2MB)', (value) => {
+          if (!value) return false
+          return value.size <= 2 * 1024 * 1024
+        })
+        .test('fileType', 'Only JPG/PNG allowed', (value) => {
+          if (!value) return false
+          return ['image/jpeg', 'image/png'].includes(value.type)
+        }),
+
     });
 
     const onFileChange = (e) => {
-      file.value = e.target.files[0];
+      form.image = e.target.files[0];
     };
 
     const submit = async () => {
@@ -121,8 +129,13 @@ export default {
         const data = { ...form };
         if (file.value) data.image = file.value;
         await store.register(data);
-
-        alert('Registration successful! Please login.');
+        Swal.fire({
+          title: "Register",
+          text: "Register successfully",
+          toast: true,
+          icon: "success",
+          timer: 1500
+        });
 
       } catch (err) {
         if (err.inner) {
@@ -130,7 +143,13 @@ export default {
             errors[e.path] = e.message;
           });
         } else {
-          alert('Registration failed. Please try again.');
+          Swal.fire({
+            title: "Register failed",
+            text: "Register Failed",
+            toast: true,
+            icon: "error",
+            timer: 1500
+          });
           console.error(err);
         }
       }

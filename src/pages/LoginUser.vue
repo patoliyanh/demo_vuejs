@@ -11,6 +11,11 @@
         <small class="text-danger">{{ errors.password }}</small>
       </div>
       <button class="btn btn-primary">Login</button>
+      <p class="mt-3">
+        Don't have an account?
+        <router-link to="/register" class="text-primary">Create Account</router-link>
+      </p>
+
     </form>
   </div>
 </template>
@@ -19,6 +24,7 @@
 import { reactive } from 'vue';
 import { useUserStore } from '../stores/userStore';
 import * as yup from 'yup';
+import Swal from 'sweetalert2';
 
 export default {
   setup() {
@@ -38,7 +44,13 @@ export default {
         await store.login(form);
       } catch (err) {
         if (err.inner) err.inner.forEach(e => errors[e.path] = e.message);
-        else alert('Login failed');
+        else Swal.fire({
+          title: "Register failed",
+          text: "Register Failed",
+          toast: true,
+          icon: "error",
+          timer: 1500
+        });
       }
     }
 

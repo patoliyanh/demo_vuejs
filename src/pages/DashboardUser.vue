@@ -36,6 +36,7 @@
 import { onMounted, ref } from 'vue';
 import { useUserStore } from '../stores/userStore';
 import router from '@/router';
+import Swal from 'sweetalert2';
 
 
 export default {
@@ -46,7 +47,34 @@ export default {
     const fetchUsers = async () => { await store.fetchUsers(); }
 
     const deleteUser = async id => {
-      if (confirm('Are you sure?')) await store.deleteUser(id);
+      const result = await Swal.fire({
+        title: "Are you sure?",
+        text: "this post will be deleted permanently",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#d33",
+        cancelButtonColor: "#3085d6",
+        confirmButtonText: "Yes,delete",
+        cancelButtonText: "Cancel",
+
+      });
+      if (!result.isConfirmed) return;
+      try {
+        await store.deleteUser(id);
+        Swal.fire({
+          title: "Deleted",
+          text: "post deleted successfully",
+          icon: "success",
+          timer: 1500
+        });
+      } catch {
+        Swal.fire({
+          title: "Error",
+          text: "Failed to delete post",
+          icon: "error"
+        });
+
+      }
     }
     const editUser = user => {
       router.push({ name: 'updateUser', params: { id: user.id } });
@@ -54,7 +82,11 @@ export default {
     }
     const logoutUsers = async () => { await store.logout(); }
 
-    onMounted(fetchUsers);
+    // onMounted(fetchUsers);
+
+    onMounted(async () => {
+      await fetchUsers()
+    })
     return { store, fetchUsers, deleteUser, editUser, logoutUsers, path };
   }
 }
