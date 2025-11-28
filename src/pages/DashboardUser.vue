@@ -49,7 +49,8 @@ export default {
       if (confirm('Are you sure?')) await store.deleteUser(id);
     }
     const editUser = user => {
-      router.push(`/users/${user.id}`);
+      router.push({ name: 'updateUser', params: { id: user.id } });
+
     }
     const logoutUsers = async () => { await store.logout(); }
 

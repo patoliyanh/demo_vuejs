@@ -7,6 +7,7 @@ export const useUserStore = defineStore('user', {
     token: localStorage.getItem('token') || null,
     currentUser: null,
     users: [],
+    user: [],
   }),
   actions: {
     setToken(token) {
@@ -36,12 +37,18 @@ export const useUserStore = defineStore('user', {
       const res = await api.get('/users')
       this.users = res.data
     },
+    async editUsers(id) {
+      const res = await api.get(`/edit/${id}`)
+      this.user = res.data
+    },
     async updateUser(id, data) {
       const formData = new FormData()
-      for (let k in data) formData.append(k, data[k])
-      const res = await api.post(`/users/${id}?_method=PUT`, formData)
-      const idx = this.users.findIndex((u) => u.id === id)
-      if (idx !== -1) this.users[idx] = res.data
+      for (let k in data) {
+        formData.append(k, data[k])
+      }
+      const res = await api.post(`/users/${id}`, formData)
+      this.user = res.data
+      return res.data
     },
 
     async deleteUser(id) {

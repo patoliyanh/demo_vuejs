@@ -1,67 +1,63 @@
 <template>
   <div class="update-container">
-    <h2 class="mb-4">Update Profile</h2>
+    <h2 class="mb-4">Update Users</h2>
 
-    <form @submit.prevent="submit" class="needs-validation">
+    <form @submit.prevent="submit">
       <div class="mb-3">
-        <label for="fname" class="form-label">First Name</label>
-        <input v-model="form.fname" type="text" id="fname" class="form-control" />
+        <label>First Name</label>
+        <input v-model="form.fname" type="text" class="form-control" />
         <small class="text-danger">{{ errors.fname }}</small>
       </div>
 
       <div class="mb-3">
-        <label for="lname" class="form-label">Last Name</label>
-        <input v-model="form.lname" type="text" id="lname" class="form-control" />
+        <label>Last Name</label>
+        <input v-model="form.lname" type="text" class="form-control" />
         <small class="text-danger">{{ errors.lname }}</small>
       </div>
 
       <div class="mb-3">
-        <label for="email" class="form-label">Email</label>
-        <input v-model="form.email" type="email" id="email" class="form-control" disabled />
+        <label>Email</label>
+        <input v-model="form.email" type="email" class="form-control" />
         <small class="text-danger">{{ errors.email }}</small>
       </div>
 
       <div class="mb-3">
-        <label for="password" class="form-label">New Password (optional)</label>
-        <input v-model="form.password" type="password" id="password" class="form-control" />
+        <label>New Password (optional)</label>
+        <input v-model="form.password" type="password" class="form-control" />
         <small class="text-danger">{{ errors.password }}</small>
       </div>
 
       <div class="mb-3">
-        <label for="phone" class="form-label">Phone</label>
-        <input v-model="form.phone" type="text" id="phone" class="form-control" />
+        <label>Phone</label>
+        <input v-model="form.phone" type="text" class="form-control" />
         <small class="text-danger">{{ errors.phone }}</small>
       </div>
 
       <div class="mb-3">
-        <label for="dob" class="form-label">Date of Birth</label>
-        <input v-model="form.dob" type="date" id="dob" class="form-control" />
+        <label>Date of Birth</label>
+        <input v-model="form.dob" type="date" class="form-control" />
         <small class="text-danger">{{ errors.dob }}</small>
       </div>
 
-      <div class="mb-3 text-start">
-        <label class="form-label">Gender</label>
-
+      <div class="mb-3">
+        <label>Gender</label>
         <div class="form-check">
-          <input class="form-check-input" type="radio" id="male" value="male" v-model="form.gender" />
-          <label for="male" class="form-check-label">Male</label>
+          <input type="radio" value="male" v-model="form.gender" class="form-check-input" />
+          <label class="form-label">Male</label>
         </div>
-
         <div class="form-check">
-          <input class="form-check-input" type="radio" id="female" value="female" v-model="form.gender" />
-          <label for="female" class="form-check-label">Female</label>
+          <input type="radio" value="female" v-model="form.gender" class="form-check-input" />
+          <label class="form-label">Female</label>
         </div>
-
         <small class="text-danger">{{ errors.gender }}</small>
       </div>
 
       <div class="mb-3">
-        <label for="image" class="form-label">Profile Image (optional)</label>
-        <input type="file" @change="onFileChange" id="image" class="form-control" />
-        <small class="text-danger">{{ errors.image }}</small>
+        <label>Profile Image (optional)</label>
+        <input type="file" @change="onFileChange" class="form-control" />
       </div>
 
-      <button type="submit" class="btn btn-primary">Update</button>
+      <button class="btn btn-primary">Update</button>
     </form>
   </div>
 </template>
@@ -70,17 +66,22 @@
 import { reactive, ref, onMounted } from "vue";
 import { useUserStore } from "../stores/userStore";
 import * as yup from "yup";
+import { useRoute } from "vue-router";
+import router from "@/router";
 
 export default {
   setup() {
+    const route = useRoute();
     const store = useUserStore();
+    const userId = route.params.id;
+
     const file = ref(null);
 
     const form = reactive({
       fname: "",
       lname: "",
       email: "",
-      password: "",
+      // password: "",
       phone: "",
       dob: "",
       gender: "",
@@ -91,19 +92,29 @@ export default {
     const schema = yup.object({
       fname: yup.string().required("First name is required"),
       lname: yup.string().required("Last name is required"),
-      phone: yup
-        .string()
+      phone: yup.string()
         .matches(/^\+?[1-9]\d{9,14}$/, "Invalid phone")
-        .required("Phone number is required"),
-      dob: yup.date().required("Date of birth required"),
+        .required("Phone is required"),
+      dob: yup.date().required("Date of birth is required"),
       gender: yup.string().required("Gender is required"),
-      password: yup.string().min(6, "Password must be at least 6 characters").notRequired(),
+      // password: yup.string().min(6).notRequired(),
     });
 
-    onMounted(() => {
-      const user = store.users;
-      Object.assign(form, user);
+    onMounted(async () => {
+      console.log(userId)
+
+      await store.editUsers(userId);
+      if (store.user) {
+        form.fname = store.user.fname || store.user.firstName || "";
+        form.lname = store.user.lname || store.user.lastName || "";
+        form.email = store.user.email || "";
+        form.phone = store.user.phone || "";
+        form.dob = store.user.dob ? store.user.dob.split("T")[0] : "";
+        form.gender = store.user.gender || "";
+      }
     });
+
+
 
     const onFileChange = (e) => {
       file.value = e.target.files[0];
@@ -111,35 +122,28 @@ export default {
 
     const submit = async () => {
       try {
-        // Reset errors
-        Object.keys(errors).forEach((key) => (errors[key] = ""));
+        Object.keys(errors).forEach((k) => (errors[k] = ""));
+
         await schema.validate(form, { abortEarly: false });
 
-        // Prepare FormData for file upload
-        const data = new FormData();
-        Object.keys(form).forEach((key) => {
-          if (form[key]) data.append(key, form[key]);
-        });
-        if (file.value) {
-          data.append("image", file.value);
-        }
+        const data = { ...form };
+        if (file.value) data.image = file.value;
 
-        await store.updateUser(data, true); // Pass 'true' if your store handles FormData differently
+        await store.updateUser(userId, data);
 
-        alert("Profile updated successfully!");
+        alert("Updated successfully!");
+        router.push('/dashboard');
       } catch (err) {
         if (err.inner) {
-          err.inner.forEach((e) => {
-            errors[e.path] = e.message;
-          });
+          err.inner.forEach((e) => (errors[e.path] = e.message));
         } else {
-          alert("Update failed.");
           console.error(err);
+          alert("Update failed.");
         }
       }
     };
 
-    return { form, errors, submit, onFileChange };
+    return { form, errors, submit, onFileChange, route };
   },
 };
 </script>
@@ -148,19 +152,5 @@ export default {
 .update-container {
   max-width: 400px;
   margin: 80px auto;
-  padding: 30px;
-  border: 1px solid #ddd;
-  border-radius: 10px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  text-align: left;
-}
-
-.update-container input {
-  width: 100%;
-}
-
-.update-container button {
-  margin-top: 15px;
-  background-color: #007bff;
 }
 </style>

@@ -10,7 +10,12 @@ const routes = [
   { path: '/login', component: LoginUser, name: 'login' },
   { path: '/register', component: Register, name: 'register' },
   { path: '/dashboard', component: DashboardUser, name: 'dashboard', meta: { requiresAuth: true } },
-  { path: '/users/{id}', component: UpdateUser, name: 'updateUser', meta: { requiresAuth: true } },
+  {
+    path: '/users/:id',
+    component: UpdateUser,
+    name: 'updateUser',
+    meta: { requiresAuth: true },
+  },
 ]
 
 const router = createRouter({
