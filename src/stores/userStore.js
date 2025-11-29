@@ -18,7 +18,7 @@ export const useUserStore = defineStore('user', {
       const formData = new FormData()
       for (let k in data) formData.append(k, data[k])
       await api.post('/register', formData)
-      router.push('/login')
+      router.push('/')
     },
     async login(data) {
       const res = await api.post('/login', data)
@@ -37,6 +37,7 @@ export const useUserStore = defineStore('user', {
       const res = await api.get('/users')
       this.users = res.data
     },
+
     async editUsers(id) {
       const existing = this.users.find((u) => u.id == id)
       if (existing) {
@@ -48,19 +49,24 @@ export const useUserStore = defineStore('user', {
       this.user = res.data
       return res.data
     },
-
     async updateUser(id, data) {
       const formData = new FormData()
       for (let k in data) {
         formData.append(k, data[k])
       }
+
       const res = await api.post(`/update/${id}`, formData)
-      this.user = res.data
-      const index = this.users.findIndex((u) => u.id === id)
+      const updatedUser = res.data
+
+      const index = this.users.findIndex((u) => u.id == id)
       if (index !== -1) {
-        this.users[index] = res.data
+        this.users[index] = updatedUser
+      } else {
+        this.users.push(updatedUser)
       }
-      return res.data
+      this.user = updatedUser
+
+      return updatedUser
     },
 
     async deleteUser(id) {

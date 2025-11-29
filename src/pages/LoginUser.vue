@@ -45,8 +45,8 @@ export default {
       } catch (err) {
         if (err.inner) err.inner.forEach(e => errors[e.path] = e.message);
         else Swal.fire({
-          title: "Register failed",
-          text: "Register Failed",
+          title: "Login failed",
+          text: "Login Failed",
           toast: true,
           icon: "error",
           timer: 1500
