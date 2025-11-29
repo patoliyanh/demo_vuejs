@@ -38,9 +38,17 @@ export const useUserStore = defineStore('user', {
       this.users = res.data
     },
     async editUsers(id) {
+      const existing = this.users.find((u) => u.id == id)
+      if (existing) {
+        this.user = existing
+        return existing
+      }
+
       const res = await api.get(`/edit/${id}`)
       this.user = res.data
+      return res.data
     },
+
     async updateUser(id, data) {
       const formData = new FormData()
       for (let k in data) {
@@ -50,7 +58,7 @@ export const useUserStore = defineStore('user', {
       this.user = res.data
       const index = this.users.findIndex((u) => u.id === id)
       if (index !== -1) {
-        this.users[index] = res.data
+        Object.assign(this.users[index], res.data)
       }
       return res.data
     },
