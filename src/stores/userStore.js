@@ -31,7 +31,7 @@ export const useUserStore = defineStore('user', {
       this.token = null
       this.currentUser = null
       localStorage.removeItem('token')
-      router.push('/login')
+      router.push('/')
     },
     async fetchUsers() {
       const res = await api.get('/users')
@@ -58,7 +58,7 @@ export const useUserStore = defineStore('user', {
       this.user = res.data
       const index = this.users.findIndex((u) => u.id === id)
       if (index !== -1) {
-        Object.assign(this.users[index], res.data)
+        this.users[index] = res.data
       }
       return res.data
     },
