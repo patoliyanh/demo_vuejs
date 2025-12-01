@@ -33,7 +33,13 @@ export const useUserStore = defineStore('user', {
       localStorage.removeItem('token')
       router.push('/')
     },
-    async fetchUsers() {
+    async fetchUsers(force = false) {
+      if (this.users.length > 0 && !force) {
+        console.log('Users already loaded — no API call')
+        return
+      }
+
+      console.log('Fetching users from API...')
       const res = await api.get('/users')
       this.users = res.data
     },
@@ -68,7 +74,6 @@ export const useUserStore = defineStore('user', {
 
       return updatedUser
     },
-
     async deleteUser(id) {
       await api.delete(`/delete/${id}`)
       this.users = this.users.filter((u) => u.id !== id)
