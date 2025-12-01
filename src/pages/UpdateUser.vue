@@ -53,7 +53,7 @@
       </div>
 
       <div class="mb-3">
-        <label>Profile Image</label>
+        <label>Profile Image(optional)</label>
         <input type="file" @change="onFileChange" class="form-control" />
         <small class="text-danger">{{ errors.image }}</small>
       </div>
@@ -85,8 +85,9 @@ export default {
       phone: "",
       dob: "",
       gender: "",
-      image: null,
     })
+
+
 
     const errors = reactive({})
     const file = ref(null)
